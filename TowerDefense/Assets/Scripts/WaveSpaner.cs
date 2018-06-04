@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WaveSpaner : MonoBehaviour {
 
     public Transform enemyPrefab;
 
     public float timeBetweenWaves = 5f;
+    public Text waveCount;
     private float countdown = 2f;
 
     private int waveNumber = 1;
@@ -36,7 +38,9 @@ public class WaveSpaner : MonoBehaviour {
             SpawnEnemy();
             yield return new WaitForSeconds(0.5f);
         }
+        waveCount.text = "Wave: " + waveNumber;
         waveNumber++;
+        
     }
 
     void SpawnEnemy()
