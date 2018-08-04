@@ -7,8 +7,12 @@ public class Node : MonoBehaviour {
 
     public Color hoverColor;
     public Color notEnoughMoneyColor;
-    [Header("Optional")]
+    [HideInInspector]
     public GameObject turret;
+    [HideInInspector]
+    public TurretBluePrint turretBluePrint;
+    [HideInInspector]
+    public bool isUpgraded = false;
 
     private Renderer rend;
     private Color startColor;
@@ -23,33 +27,29 @@ public class Node : MonoBehaviour {
         startColor = rend.material.color;
         buildManager = BuildManager.instance;
     }
-	
-	// Update is called once per frame
-	void Update () {
-        
-	}
 
     private void OnMouseDown()
     {
-        if (!buildManager.CanBuild)
-            return;
-        if(turret != null)
+        if (turret != null)
         {
+            buildManager.SelectNode(this);
             return;
         }
+        if (!buildManager.CanBuild)
+            return;
 
-        buildManager.BuildTurretOn(this);
+        BuildTurret(buildManager.GetTurretToBuild());
     }
 
     void OnMouseEnter()
     {
         if (EventSystem.current.IsPointerOverGameObject())
             return;
-        if (!buildManager.CanBuild)
+        if (turret != null)
         {
             return;
         }
-        if (turret != null)
+        if (!buildManager.CanBuild)
         {
             return;
         }
@@ -72,5 +72,41 @@ public class Node : MonoBehaviour {
     public Vector3 GetBuildPosition()
     {
         return transform.position + positionOffset;
+    }
+
+    void BuildTurret(TurretBluePrint bluePrint)
+    {
+        if (PlayerStat.Money < bluePrint.cost)
+        {
+            return;
+        }
+        PlayerStat.Money -= bluePrint.cost;
+        GameObject _turret = Instantiate(bluePrint.prefab, GetBuildPosition(), Quaternion.identity);
+        turret = _turret;
+        turretBluePrint = bluePrint;
+    }
+
+    public void UpgradeTurret()
+    {
+        if (PlayerStat.Money < turretBluePrint.upgradeCost)
+        {
+            return;
+        }
+        PlayerStat.Money -= turretBluePrint.upgradeCost;
+
+        Destroy(turret);
+
+        GameObject _turret = Instantiate(turretBluePrint.upgradedPrefab, GetBuildPosition(), Quaternion.identity);
+        turret = _turret;
+
+        isUpgraded = true;
+    }
+
+    public void SellTurret()
+    {
+        PlayerStat.Money += turretBluePrint.GetSellAmount(isUpgraded);
+
+        Destroy(turret);
+        turretBluePrint = null;
     }
 }

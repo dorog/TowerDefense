@@ -16,10 +16,11 @@ public class BuildManager : MonoBehaviour {
     }
 
     private TurretBluePrint turretToBuild;
+    private Node selectedNode;
+    public NodeUI nodeUI;
 
-	
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update () {
 		
 	}
 
@@ -30,16 +31,31 @@ public class BuildManager : MonoBehaviour {
     public void SelectTurretToBuild(TurretBluePrint turret)
     {
         turretToBuild = turret;
+
+        DeselectNode();
     }
 
-    public void BuildTurretOn(Node node)
+    public void SelectNode(Node node)
     {
-        if(PlayerStat.Money < turretToBuild.cost)
+        if(selectedNode == node)
         {
+            DeselectNode();
             return;
         }
-        PlayerStat.Money -= turretToBuild.cost;
-        GameObject turret = Instantiate(turretToBuild.prefab, node.GetBuildPosition(), Quaternion.identity);
-        node.turret = turret;
+        selectedNode = node;
+        turretToBuild = null;
+
+        nodeUI.SetTarget(node);
+    }
+
+    public void DeselectNode()
+    {
+        selectedNode = null;
+        nodeUI.Hide();
+    }
+
+    public TurretBluePrint GetTurretToBuild()
+    {
+        return turretToBuild;
     }
 }

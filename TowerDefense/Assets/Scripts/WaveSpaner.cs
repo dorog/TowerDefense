@@ -40,7 +40,7 @@ public class WaveSpaner : MonoBehaviour {
         }
         waveCount.text = "Wave: " + waveNumber;
         waveNumber++;
-        
+        PlayerStat.Rounds++;
     }
 
     void SpawnEnemy()

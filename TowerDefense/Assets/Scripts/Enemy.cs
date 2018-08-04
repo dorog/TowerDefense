@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour {
-
+    [HideInInspector]
     public float speed = 10f;
+ 
+    public float startSpeed = 0;
 
-    public int health = 100;
+    public float health = 100;
 
-    public int value = 50;
+    public int worth = 50;
 
-    private Transform target;
-    private int wavepointIndex = 0;
+    private void Start()
+    {
+        speed = startSpeed;
+    }
 
-	// Use this for initialization
-	void Start () {
-        target = WayPoints.points[0];
-	}
-
-    public void TakeDamage(int amount)
+    public void TakeDamage(float amount)
     {
         health -= amount;
         if(health <= 0)
@@ -26,37 +25,15 @@ public class Enemy : MonoBehaviour {
             Die();
         }
     }
-	
-	// Update is called once per frame
-	void Update () {
-        Vector3 dir = target.position - transform.position;
-        transform.Translate(dir.normalized*speed*Time.deltaTime, Space.World);
-        if(Vector3.Distance(transform.position, target.position) <= 0.4f)
-        {
-            GetNextWayPoint();
-        }
-	}
 
-    void GetNextWayPoint()
+    public void Slow(float pct)
     {
-        if(wavepointIndex >= WayPoints.points.Length - 1)
-        {
-            EndPath();
-            return;
-        }
-        wavepointIndex++;
-        target = WayPoints.points[wavepointIndex];
-    }
-
-    void EndPath()
-    {
-        PlayerStat.Lives--;
-        Destroy(gameObject);
+        speed = startSpeed * pct;
     }
 
     void Die()
     {
-        PlayerStat.Money += value;
+        PlayerStat.Money += worth;
         Destroy(gameObject);
     }
 }
